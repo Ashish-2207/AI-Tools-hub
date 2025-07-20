@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tools Hub</title>
+  <style>
+    :root {
+      --bg: #f5f5fa;
+      --card-bg: #ffffff;
+      --text: #222;
+      --accent: #4b6cb7;
+    }
+    html[data-theme="dark"] {
+      --bg: #121629;
+      --card-bg: #232946;
+      --text: #e0e0ff;
+      --accent: #b8c1ec;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      margin: 0;
+    }
+    .theme-toggle {
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .theme-toggle:hover {
+      background: #6e86e2;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    select, input[type="text"] {
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    input[type="text"] {
+      width: 250px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.35s ease;
+      cursor: pointer;
+      transform: translateY(0);
+      opacity: 0;
+      animation: fadeInUp 0.5s forwards;
+    }
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 6px 20px rgba(91, 121, 255, 0.3);
+    }
+    .card h3 {
+      margin: 0.5rem 0;
+    }
+    .card p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.2rem; }
+      .controls { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚀 AI Tools Hub</h1>
+    <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+  </header>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search tools...">
+    <select id="categoryFilter">
+      <option value="all">All Categories</option>
+      <option value="assistant">AI Assistants</option>
+      <option value="search">AI Search</option>
+      <option value="creativity">Creative Tools</option>
+      <option value="developer">Developer Tools</option>
+      <option value="video">Video Tools</option>
+      <option value="writing">Writing Tools</option>
+      <option value="productivity">Productivity</option>
+      <option value="voice">Voice/Audio</option>
+      <option value="music">Music Generation</option>
+      <option value="automation">Automation</option>
+      <option value="business">Business/Marketing</option>
+      <option value="translation">Translation</option>
+      <option value="hybrid">Emerging Platforms</option>
+      <option value="directory">Tool Directories</option>
+    </select>
+  </div>
+
+  <div class="grid" id="toolGrid"></div>
+
+  <script>
+    const html = document.documentElement;
+    html.setAttribute('data-theme', localStorage.theme || 'light');
+    document.getElementById('themeToggle').onclick = () => {
+      const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.theme = newTheme;
+    };
+
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const toolGrid = document.getElementById('toolGrid');
+
+    const tools = [
+      { name: "ChatGPT", category: "assistant", desc: "Versatile assistant", link: "https://chat.openai.com/" },
+      { name: "Claude", category: "assistant", desc: "Reasoning & coding", link: "https://claude.ai/" },
+      { name: "Gemini", category: "assistant", desc: "Google's multimodal AI", link: "https://gemini.google.com/" },
+      { name: "Veo / Veo 3", category: "video", desc: "AI video generation by Google", link: "https://deepmind.google/technologies/veo/" },
+      { name: "Grok", category: "assistant", desc: "Real-time fact-checking", link: "https://x.com" },
+      { name: "Perplexity", category: "search", desc: "Chat + Search + Sources", link: "https://www.perplexity.ai/" },
+      { name: "V0", category: "code", desc: "Build UI with AI from Vercel", link: "https://v0.dev/" },
+
+{ name: "Lovable AI", category: "copywriting", desc: "AI tool for brand storytelling", link: "https://www.lovable.so/" },
+{ name: "DeepSeek", category: "chatbot", desc: "Powerful open-source LLM by DeepSeek", link: "https://deepseek.com/" },
+{ name: "Bolt AI", category: "chatbot", desc: "Mac native ChatGPT client with shortcuts", link: "https://bolt.new/" },
+{ name: "Beautiful.ai", category: "presentation", desc: "AI-powered presentation maker", link: "https://www.beautiful.ai/" },
+{ name: "Copilot", category: "code", desc: "AI coding assistant by GitHub", link: "https://copilot.microsoft.com/chats/fdDRuybsDddJRPiwmbEJs" },
+      { name: "Codeium", category: "code", desc: "AI code completion", link: "https://www.codeium.com/" },
+      { name: "CodeWhisperer", category: "code", desc: "Amazon's AI coding assistant", link: "https://aws.amazon.com/codewhisperer/" },
+      { name: "Kuki", category: "chatbot", desc: "Conversational AI chatbot", link: "https://www.kuki.ai/" },
+      { name: "ChatSonic", category: "assistant", desc: "AI chat with voice & images", link: "https://writesonic.com/chat" },
+      { name: "YouChat", category: "search", desc: "AI search engine with chat", link: "https://you.com/chat" },
+      { name: "Midjourney", category: "creativity", desc: "Text to Image", link: "https://www.midjourney.com/" },
+      { name: "DALL·E 3", category: "creativity", desc: "OpenAI image generation", link: "https://openai.com/dall-e" },
+      { name: "Stable Diffusion", category: "creativity", desc: "Open source image AI", link: "https://stablediffusionweb.com/" },
+      { name: "Canva Magic Studio", category: "creativity", desc: "Design with AI", link: "https://www.canva.com/" },
+      { name: "Synthesia", category: "video", desc: "AI Avatar Videos", link: "https://www.synthesia.io/" },
+      { name: "OpusClip", category: "video", desc: "Clip generator", link: "https://opusclip.com/" },
+      { name: "Jasper", category: "writing", desc: "Blog & Marketing", link: "https://www.jasper.ai/" },
+      { name: "Rytr", category: "writing", desc: "AI writing assistant", link: "https://rytr.me/" },
+      { name: "Sudowrite", category: "writing", desc: "Creative writing AI", link: "https://www.sudowrite.com/" },
+      { name: "Writesonic", category: "writing", desc: "Marketing & copywriting", link: "https://writesonic.com/" },
+      { name: "GitHub Copilot", category: "developer", desc: "Code Assistant", link: "https://github.com/features/copilot" },
+      { name: "Cursor", category: "developer", desc: "AI IDE", link: "https://cursor.sh/" },
+      { name: "NotebookLM", category: "productivity", desc: "Research assistant", link: "https://notebooklm.google.com/" },
+      { name: "Fathom", category: "productivity", desc: "AI meeting assistant", link: "https://fathom.video/" },
+      { name: "Nyota", category: "productivity", desc: "Meeting summarizer", link: "https://nyota.ai/" },
+      { name: "Deep Research", category: "productivity", desc: "Data analysis & summarizer", link: "https://deepresearch.ai/" },
+      { name: "Reclaim", category: "automation", desc: "Smart scheduling assistant", link: "https://reclaim.ai/" },
+      { name: "Clockwise", category: "automation", desc: "Calendar optimization", link: "https://www.getclockwise.com/" },
+      { name: "Manus", category: "automation", desc: "Workflow automation tool", link: "https://manus.ai/" },
+      { name: "ElevenLabs", category: "voice", desc: "Text-to-Speech", link: "https://www.elevenlabs.io/" },
+      { name: "Murf", category: "voice", desc: "Voiceover with accents", link: "https://murf.ai/" },
+      { name: "Suno", category: "music", desc: "Music Generator", link: "https://suno.ai/" },
+      { name: "AdCreative", category: "business", desc: "Marketing visuals", link: "https://www.adcreative.ai/" },
+      { name: "HubSpot Email Writer", category: "business", desc: "Email assistant", link: "https://www.hubspot.com/" },
+      { name: "Shortwave", category: "business", desc: "Email summarization", link: "https://www.shortwave.com/" },
+      { name: "Google Translate", category: "translation", desc: "Multilingual translation", link: "https://translate.google.com/" },
+      { name: "DeepL", category: "translation", desc: "Accurate translation", link: "https://www.deepl.com/" },
+      { name: "Apple Intelligence", category: "hybrid", desc: "iOS/macOS AI", link: "https://www.apple.com/apple-intelligence/" },
+      { name: "Lumio AI", category: "hybrid", desc: "Unified AI interface", link: "https://lumio.ai/" },
+      { name: "Mistral AI", category: "hybrid", desc: "Open-source LLMs", link: "https://mistral.ai/" },
+      { name: "Insidr.ai", category: "directory", desc: "500+ AI tools", link: "https://insidr.ai/" },
+      { name: "GPTify", category: "directory", desc: "Open-source LLMs", link: "https://gptify.ai/" },
+      { name: "AI Tools Directory", category: "directory", desc: "Curated AI tools", link: "https://aitools.directory/" },
+      { name: "AI Tool Hunt", category: "directory", desc: "Discover AI tools", link: "https://aitoolhunt.com/" },
+      { name: "AI Tool Tracker", category: "directory", desc: "Track AI tools", link: "https://aitooltracker.com/" },
+    ];
+
+    function renderTools() {
+  const query = searchInput.value.toLowerCase();
+  const category = categoryFilter.value;
+  toolGrid.innerHTML = '';
+  tools.forEach(tool => {
+    const matchesSearch = tool.name.toLowerCase().includes(query) || tool.desc.toLowerCase().includes(query);
+    const matchesCategory = category === 'all' || tool.category === category;
+    if (matchesSearch && matchesCategory) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.setAttribute('data-category', tool.category);
+      card.onclick = () => window.open(tool.link, '_blank', 'noopener,noreferrer');
+      card.innerHTML = `<h3>${tool.name}</h3><p>${tool.desc}</p>`;
+      toolGrid.appendChild(card);
+    }
+  });
+}
+
+
+    searchInput.addEventListener('input', renderTools);
+    categoryFilter.addEventListener('change', renderTools);
+    renderTools();
+  </script>
+</body>
+</html>
